@@ -1,5 +1,8 @@
 import { v4 as uuid } from 'uuid';
-import logger from './logger.mjs';
+import { configLocalStorage } from './localStorage.mjs';
+import { createLogger } from './logger.mjs';
+
+const logger = createLogger("httpLogger");
 
 export const httpLogMiddleware = (req, res, next) => {
     const reqId = uuid();
@@ -7,22 +10,17 @@ export const httpLogMiddleware = (req, res, next) => {
 
     const reqInfo = {
         url: req.url,
-        'X-Request-Id': reqId
+        host: req.hostname,
+        request_id: reqId
     };
 
-    logger.log({
-        message: `Processing Request - ${reqId}`,
-        context: reqInfo,
-    });
+    logger.info(`Processing Request - ${reqId}`, reqInfo);
 
     res.on('finish', function onFinish() {
         const responseTime = Math.ceil(performance.now() - startTime);
         const resInfo = { statusCode: res.statusCode, message: res.statusMessage };
-        logger.log({
-            message: `Request ${reqId} took ${responseTime}ms to finish`,
-            context: { ...resInfo },
-        });
+        logger.info(`Request ${reqId} took ${responseTime}ms to finish`, { ...resInfo, responseTime });
     });
 
-    next();
+    configLocalStorage.run(reqInfo, next);
 };

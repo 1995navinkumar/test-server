@@ -2,7 +2,7 @@ import { Registry, collectDefaultMetrics, Counter, Histogram } from 'prom-client
 export const pcRegistryInstance = new Registry();
 
 const prefixMetricNameWithAppName = (metricName) => {
-  return `node_app_${metricName}`;
+  return `test_server_${metricName}`;
 };
 
 collectDefaultMetrics({
