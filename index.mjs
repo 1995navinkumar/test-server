@@ -19,6 +19,10 @@ app.get("/error", (req, res) => {
     res.status(500).send("Intentional Error Thrown");
 })
 
+app.get("/uncaught", (req, res) => {
+    throw new Error("uncaught error in code");
+})
+
 app.get("/*", async (req, res) => {
     await waitFor(Math.random() * 5000);
     res.end("Successful..!!");
@@ -49,7 +53,7 @@ app.get("/*", async (req, res) => {
 
 app.use((err, req, res, next) => {
     logger.error(err);
-    res.end("Something went wrong bro..!!");
+    res.status(500).send("Something went wrong bro..!!");
 })
 
 const server = app.listen(port, function () {
